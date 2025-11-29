@@ -20,56 +20,18 @@ public:
     }
 };
 
-Node *reverseLL(Node *head)
-{
-    Node *current = head;
-    Node *prev = nullptr;
-    while (current != nullptr)
-    {
-        Node *temp = current->next;
-        current->next = prev;
-        prev = current;
-        current = temp;
-    }
-    return prev;
-}
-
-Node *addingOneToLL(Node *head)
-{
-    // TC -> O(3N)
-    // SC -> O(1)
-    if (head == nullptr)
-    {
-        return nullptr;
-    }
-
-    head = reverseLL(head);
-    Node *temp = head;
-    int carry = 1;
-    while (temp != nullptr)
-    {
-        int sum = temp->data + carry;
-        temp->data = sum % 10; // this helps to get the right most digit
-        carry = sum / 10;      // this helps to get the carry
-        if (temp->next == nullptr && carry)
-        {
-            temp->next = new Node(carry);
-            carry = 0;
-        }
-        temp = temp->next;
-    }
-    head = reverseLL(head);
-    return head;
-}
-
 void printLL(Node *head)
 {
+    if (head == nullptr)
+    {
+        return;
+    }
     while (head != nullptr)
     {
         cout << head->data << " -> ";
         head = head->next;
     }
-    cout << "NULL\n";
+    cout << "NULL";
 }
 
 Node *array2LL(vector<int> &a)
@@ -88,14 +50,61 @@ Node *array2LL(vector<int> &a)
     }
     return head;
 }
+
+Node *reverseTheLL(Node *head)
+{
+    if (head == nullptr || head->next == nullptr)
+    {
+        return head;
+    }
+    Node *current = head;
+    Node *prev = nullptr;
+    while (current != nullptr)
+    {
+        Node *temp = current->next;
+        current->next = prev;
+        prev = current;
+        current = temp;
+    }
+    return prev;
+}
+
+int getCarry(Node *temp)
+{
+    if (temp == nullptr)
+    {
+        return 1;
+    }
+    int carry = getCarry(temp->next);
+    temp->data += carry;
+    if (temp->data < 10)
+    {
+        return 0;
+    }
+    temp->data = 0;
+    return 1;
+}
+
+Node *addOne(Node *head)
+{
+    int carry = getCarry(head);
+    if (carry == 1)
+    {
+        Node *newNode = new Node(1);
+        newNode->next = head;
+        head = newNode;
+    }
+    return head;
+}
+
 int main()
 {
-    vector<int> a = {1, 5, 9};
+    vector<int> a = {9, 8, 9};
     Node *head = array2LL(a);
-    cout << "Before adding one is: \n";
+    cout << "LL before adding 1: \n";
     printLL(head);
-    Node *newNode = addingOneToLL(head);
-    cout << "After adding one is: \n";
-    printLL(newNode);
+    Node *newHead = addOne(head);
+    cout << "\nLL after adding 1: \n";
+    printLL(newHead);
     return 0;
 }
